@@ -1,0 +1,23 @@
+#header { color : white;
+background-color: black;
+font-family: monospace;
+padding: 1em;}
+
+.main-page {
+  background-color: blue;
+  margin-left:25%;
+}
+
+.sidebar {
+  padding:10px 0;
+  float:left;
+  border:dotted;
+  display:block;
+  outline:0;
+  margin-left:0px;
+  width:25%;}
+
+.subsidebar {background-color: red;
+  color: white;
+  padding: 10% 1%;
+}
