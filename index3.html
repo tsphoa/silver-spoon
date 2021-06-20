@@ -1,0 +1,166 @@
+<html>
+<head>
+</head>
+<body>
+	<h1>GAME</h1>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+<script>
+	var canvas;
+	var canvasContext;
+
+	//ball X & Y and Size
+	var ballX = 400;
+	var ballY = 300;
+	var ballSize = 10;
+
+	//ball movement speed X & Y
+	var moveX = 7;
+	var moveY = 10;
+
+	//Left player paddle	
+	var paddleLocation1Y = 400;
+	//Right Computer paddle
+	var paddleLocation2Y = 400;
+
+		var paddleSize = 100;
+		var paddleThickness = 15;
+
+	//score board
+	var player1score = 0;
+	var player2score = 0;
+	var winning_score = 3;
+function MousePosition(evt) {
+	var rect = canvas.getBoundingClientRect();
+	var root = document.documentElement;
+	var mouseX = evt.clientX - rect.left - root.scrollLeft;
+	var mouseY = evt.clientY - rect.top - root.scrollTop;
+	return {
+		x: mouseX,
+		y: mouseY
+	};
+}
+
+//add event - mouse move - change var paddleLocation1Y (player 1 paddle location)
+
+
+window.onload = function() {
+	canvas = document.getElementById('gameCanvas');
+	canvasContext = canvas.getContext('2d');
+
+	var framePerSecond = 30;
+	// 30 fps -> setInterval -> auto calculate the refresh rate
+	setInterval(
+		function() {
+				moveEverything();
+				drawEverything();
+		}, 1000/framePerSecond);
+
+	canvas.addEventListener('mousemove', function(evt) {
+		var mousePos = MousePosition(evt);
+			paddleLocation1Y = mousePos.y-(paddleSize/2);
+	});
+
+}
+
+
+	//function to draw different color ball at different location
+	function drawBall(x, y, color) {
+		canvasContext.fillStyle = color;
+		canvasContext.beginPath();
+		canvasContext.arc(x, y, ballSize, 0, Math.PI*2, true);
+		canvasContext.fill();
+	}
+
+	//function to draw Rec
+	function drawRect(PosX, PosY, RecWidth, RecHeight, color) {
+		canvasContext.fillStyle = color;
+		canvasContext.fillRect(PosX, PosY, RecWidth, RecHeight);
+	}
+
+function drawEverything() {
+	//background (go first or it will cover the rest in black)
+		drawRect(0,0,canvas.width, canvas.height, 'black');
+	//draw player paddle
+		drawRect(0, paddleLocation1Y, paddleThickness, paddleSize, 'white');
+	//draw right hand paddle
+		drawRect(canvas.width-paddleThickness, paddleLocation2Y, paddleThickness, paddleSize, 'white');
+
+	//drawing the red ball
+		drawBall (ballX, ballY, 'red');
+
+	//score board
+	canvasContext.fillStyle ='white';
+	canvasContext.fillText(player1score, canvas.width*0.25, canvas.height*0.25);
+	canvasContext.fillText(player2score, canvas.width*0.75, canvas.height*0.25)
+}
+
+//score
+function ballReset() {
+	if (player1score >= winning_score) {
+		alert('PLAYER WON!!');
+		gameReset();
+	} else if (player2score >= winning_score) {
+		alert('Computer Win!!');
+		gameReset();
+	} else {
+	ballX = canvas.width/2;
+	ballY = canvas.height/2;
+	moveX = -moveX;
+	moveY = -moveY;
+	}
+}
+function gameReset() {
+	player1score = 0;
+	player2score = 0;
+	ballReset();
+}
+
+function FakeAiMovement() {
+	var AIalignment = paddleLocation2Y+(paddleSize/2);
+	if (AIalignment < ballY) {
+		paddleLocation2Y += 8;
+	} else if (AIalignment > ballY) {
+		paddleLocation2Y -= 8;
+	}
+	console.log(paddleLocation2Y);
+}
+
+function moveEverything() {
+	FakeAiMovement();
+	ballX = ballX + moveX;
+	ballY = ballY + moveY;
+
+	//when ball go over the edge on the right side. 
+	if (ballX >= canvas.width-ballSize) {
+		//if the ball is within padde area, bounce back. else reset
+		if (ballY > paddleLocation2Y && ballY < paddleLocation2Y+paddleSize) {
+			var returnSpeed = ballY - (paddleLocation2Y+paddleSize/2);
+				moveY = returnSpeed * 0.35;
+			moveX = -moveX;
+		} else {
+			alert('Player Scored!');
+			player1score +=1;
+			ballReset();}
+		//the ball is score when it is less than paddleLocation1Y, or more than the paddlelocation + size (which is outside the paddle)
+	} else if (ballX <= 0 && ballY < paddleLocation1Y || ballX <=0 && ballY > paddleLocation1Y+paddleSize) {
+		alert('AI scored!');
+		player2score += 1;
+		ballReset();
+	} else if (ballX <= ballSize && ballY > paddleLocation1Y && ballY < paddleLocation1Y+paddleSize) {
+			var returnSpeed = ballY - (paddleLocation1Y+paddleSize/2);
+				moveY = returnSpeed * 0.35;
+		moveX = -moveX;
+	}
+	
+	if (ballY >= canvas.height-ballSize) {
+		moveY = -moveY;
+	} else if (ballY <= ballSize) {
+		moveY = -moveY;
+	}
+}
+
+</script>
+</body>
+</html>
+
+
